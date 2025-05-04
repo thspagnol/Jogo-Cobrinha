@@ -62,9 +62,9 @@ obstaculo_pos = []
 obstaculo_surface = pygame.Surface((BLOCK, BLOCK))
 obstaculo_surface.fill((cor_obstaculo))
 
-maca_surface = pygame.Surface((BLOCK, BLOCK), pygame.SRCALPHA)  # Permite transparência
+maca_surface = pygame.Surface((BLOCK, BLOCK), pygame.SRCALPHA)
 maca_surface.fill((180, 0, 0, 0))
-pygame.draw.circle(maca_surface, (cor_maca), (BLOCK // 2, BLOCK // 2), BLOCK // 2)  # Centro mais escuro
+pygame.draw.circle(maca_surface, (cor_maca), (BLOCK // 2, BLOCK // 2), BLOCK // 2)
 maca_pos = gera_pos_aleatoria()
 
 while True:
@@ -94,8 +94,7 @@ while True:
 
     window.blit(maca_surface, maca_pos)
 
-    # Desenhar folha verde acima da maçã
-    pygame.draw.arc(window, (0, 150, 0), (maca_pos[0] - 2, maca_pos[1] - 8, BLOCK, BLOCK), 3.8, 6.0, 4)  # Semicírculo verde
+    pygame.draw.arc(window, (0, 150, 0), (maca_pos[0] - 2, maca_pos[1] - 8, BLOCK, BLOCK), 3.8, 6.0, 4)
 
     if (colisao(cobra_pos[0], maca_pos)):
         cobra_pos.append((-10, -10)) 
@@ -111,29 +110,29 @@ while True:
         window.blit(obstaculo_surface, pos)
 
     for i, pos in enumerate(cobra_pos):
-        cobra_surface.fill(cor_cobra[i % len(cor_cobra)])  # Alterna as cores
+        cobra_surface.fill(cor_cobra[i % len(cor_cobra)])
         window.blit(cobra_surface, pos)
 
     for item in range(len(cobra_pos) -1,0,-1):
         if colisao(cobra_pos[0], cobra_pos[item]):
             game_over()
-        cobra_pos[item] = cobra_pos[item - 1]   # Move the snake
+        cobra_pos[item] = cobra_pos[item - 1]
 
     if verifica_margens(cobra_pos[0]):
         game_over()    
 
     if direcao == K_RIGHT:
-        cobra_pos[0] = (cobra_pos[0][0] + BLOCK, cobra_pos[0][1]) # Move the snake to the right   
+        cobra_pos[0] = (cobra_pos[0][0] + BLOCK, cobra_pos[0][1])  
 
     if direcao == K_LEFT:
-        cobra_pos[0] = (cobra_pos[0][0] - BLOCK, cobra_pos[0][1]) # Move the snake to the left
+        cobra_pos[0] = (cobra_pos[0][0] - BLOCK, cobra_pos[0][1])
 
     if direcao == K_UP:   
-        cobra_pos[0] = (cobra_pos[0][0], cobra_pos[0][1]  - BLOCK) # Move the snake to the up
+        cobra_pos[0] = (cobra_pos[0][0], cobra_pos[0][1]  - BLOCK)
 
     if direcao == K_DOWN:
-        cobra_pos[0] = (cobra_pos[0][0], cobra_pos[0][1] + BLOCK) # Move the snake to the down
+        cobra_pos[0] = (cobra_pos[0][0], cobra_pos[0][1] + BLOCK)
 
-    window.blit(texto, (460, 10)) # Desenha o texto na tela
+    window.blit(texto, (460, 10))
     
     pygame.display.update()
