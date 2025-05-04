@@ -62,49 +62,67 @@ def game_over(): # Função que exibe a tela de "Game Over" quando o jogador per
     quit() # Encerra o programa 
 
 pygame.init()
-window = pygame.display.set_mode((WINDOWS_WIDTH, WINDOWS_HEIGHT))
-pygame.display.set_caption("Jogo da Cobrinha")
+window = pygame.display.set_mode((WINDOWS_WIDTH, WINDOWS_HEIGHT)) # Cria a janela do jogo com as dimensões especificadas
+pygame.display.set_caption("Jogo da Cobrinha") # Define o título da janela do jogo
 
-cobra_pos = [(POS_INICIAL_X, POS_INICIAL_Y),(POS_INICIAL_X + BLOCK, POS_INICIAL_Y),(POS_INICIAL_X + 2 * BLOCK, POS_INICIAL_Y)]
-cobra_surface = pygame.Surface((BLOCK, BLOCK))
-cobra_surface.fill((cor_cobra[0]))
-direcao = K_LEFT
+cobra_pos = [(POS_INICIAL_X, POS_INICIAL_Y),(POS_INICIAL_X + BLOCK, POS_INICIAL_Y),(POS_INICIAL_X + 2 * BLOCK, POS_INICIAL_Y)] 
+# Inicializa a posição da cobra (POS_INICIAL_X, POS_INICIAL_Y) com três blocos, os outros dois blocos são criados à direita,
+# deslocados por BLOCK(10 pixels) cada um
+cobra_surface = pygame.Surface((BLOCK, BLOCK)) # Cria uma superfície para a cobra, que será desenhada na tela
+# Define o tamando da superfície como BLOCK x BLOCK (10 x 10 pixels)
+cobra_surface.fill((cor_cobra[0])) # Preenche a superfície da cobra com a primeira cor da lista cor_cobra(0) 
+# seguindo a ordem da lista
+direcao = K_LEFT # Inicializa a direção da cobra como para a esquerda (K_LEFT)
 
-obstaculo_pos = []
-obstaculo_surface = pygame.Surface((BLOCK, BLOCK))
-obstaculo_surface.fill((cor_obstaculo))
+obstaculo_pos = [] # Inicializa a lista vazia para armazenar as posições dos obstáculos,
+# que serão gerados aleatoriamente quando a cobra come uma maçã e armazenados nesta lista,
+# causa game over se a cobra colidir com um obstáculo
+obstaculo_surface = pygame.Surface((BLOCK, BLOCK)) # cria na tela uma superfície para os obstáculos(BLOCK, BLOCK = 10 x 10 pixels).
+obstaculo_surface.fill((cor_obstaculo)) # Preenche a superfície dos obstáculos com a cor especificada (cor_obstaculo)
 
-maca_surface = pygame.Surface((BLOCK, BLOCK), pygame.SRCALPHA)  # Permite transparência
-maca_surface.fill((180, 0, 0, 0))
-pygame.draw.circle(maca_surface, (cor_maca), (BLOCK // 2, BLOCK // 2), BLOCK // 2)  # Centro mais escuro
-maca_pos = gera_pos_aleatoria()
+maca_surface = pygame.Surface((BLOCK, BLOCK), pygame.SRCALPHA) # Cria uma superfície para a maçã do tamanho (BLOCK, BLOCK = 10 X 10 pixels) 
+# o argumento pygame.SRCALPHA permite que a superfície tenha um canal alfa (transparência), deixando a maçã com bordas arredondadas
+maca_surface.fill((0, 0, 0, 0)) # Preenche a superfície da maçã com uma cor transparente (0, 0, 0, 0), usado para criar gradientes
+pygame.draw.circle(maca_surface, (cor_maca), (BLOCK // 2, BLOCK // 2), BLOCK // 2) # Desenha um círculo vermelho na superfície da maçã,
+# com o centro na posição (BLOCK // 2, BLOCK // 2) e raio igual a BLOCK // 2 (5 pixels), criando uma maçã arredondada
+maca_pos = gera_pos_aleatoria() # Chama a função gera_pos_aleatoria() para gerar uma posição inicial aleatória para a maçã
+# A posição gerada é armazenada na variável maca_pos, quando a cobra colidir com a maçã a função gera_pos_aleatoria() é chamada novamente para gerar uma nova posição aleatória para a maçã
 
-while True:
-    pygame.time.Clock().tick(velocidade)
-    window.fill((cor_fundo))
+while True: # Inicia um loop infinito, garantindo que o jogo continue rodando até que seja encerrado manualmente.
+    pygame.time.Clock().tick(velocidade) # Controla a taxa de atualização da tela, definindo a velocidade do jogo.
+    # A variável "velocidade" definida no início do código determina quantas vezes por segundo a tela será atualizada(10FPS).
+    window.fill((cor_fundo)) # Preenche a janela do jogo com a cor de fundo especificada (cor_fundo), 
+    # limpando a tela antes de desenhar os novos elementos, evitando deixar rastros da cobra e maçã anteriores.
 
-    mensagem = f'Pontos: {pontos}'
-    texto = fonte.render(mensagem, True, (cor_texto)) 
+    mensagem = f'Pontos: {pontos}' # Cria uma string com a pontuação atual do jogador(f'Pontos:), que será exibida na tela,
+    # a variável pontos é inserido dinamicamente na string usando f-strings.
+    texto = fonte.render(mensagem, True, (cor_texto)) # Renderiza o texto da pontuação usando a fonte personalizada criada anteriormente,
+    # o peimeiro argumento é a string a ser renderizada, o segundo argumento True indica que o texto terá antialiasing (suavização).
 
-    for evento in pygame.event.get():
-        if evento.type == QUIT:
-            pygame.quit()
-            quit()
+    for evento in pygame.event.get(): # Loop que verifica os eventos do pygame, como pressionamento de teclas e fechamento da janela,
+    # pygame.event.get() restorna todos os eventos que correm no jogo, como pressionar uma tecla ou fechar a janela.
+    # for percorre essa lista de eventos para analizar cada um deles. 
+        if evento.type == QUIT: # Verifica se o evento é do tipo QUIT, que indica que o jogador fechou a janela do jogo
+            pygame.quit() # Finaliza todos os módulos do pygame, encerrando o jogo corretamente, evitando que ele
+            # continue rodando em segundo plano após o fechamento da janela.
+            quit() # Encerra o programa
 
-        elif evento.type == KEYDOWN:
-            if evento.key in [K_UP, K_DOWN, K_LEFT, K_RIGHT]:
-                if evento.key == K_UP and direcao == K_DOWN:
+        elif evento.type == KEYDOWN: # Verifica se um teclado foi pressionado (KEYDOWN),
+            # o código dentro desse bloco será executado qunado o jogador pressionar uma tecla.
+            if evento.key in [K_UP, K_DOWN, K_LEFT, K_RIGHT]: # Verifica se a tecla pressionada é umas tecla de direção.
+                if evento.key == K_UP and direcao == K_DOWN: # Impede mudar a direção da cobra para cima se ela já estiver indo para baixo.
                     continue
-                elif evento.key == K_DOWN and direcao == K_UP:
+                elif evento.key == K_DOWN and direcao == K_UP: # Impede mudar a direção da cobra para baixo se ela já estiver indo para cima.
                     continue
-                elif evento.key == K_LEFT and direcao == K_RIGHT:
+                elif evento.key == K_LEFT and direcao == K_RIGHT: # Impede mudar a direção da cobra para esquerda se ela já estiver indo para direita.
                     continue
-                elif evento.key == K_RIGHT and direcao == K_LEFT:
+                elif evento.key == K_RIGHT and direcao == K_LEFT: # Impede mudar a direção da cobra para direita se ela já estiver indo para esquerda.
                     continue
                 else:
-                    direcao = evento.key 
+                    direcao = evento.key # Se a tecla pressionada não violar nenhuma das regras anteriores, a variável "direcao"
+                    # recebe o valor da tecla pressionada, mudando a direção da cobra para a nova direção.
 
-    window.blit(maca_surface, maca_pos)
+    window.blit(maca_surface, maca_pos) # Desenha a maçã na tela na posição gerada aleatoriamente (maca_pos).
 
     # Desenhar folha verde acima da maçã
     pygame.draw.arc(window, (0, 150, 0), (maca_pos[0] - 2, maca_pos[1] - 8, BLOCK, BLOCK), 3.8, 6.0, 4)  # Semicírculo verde
